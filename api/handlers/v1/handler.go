@@ -15,7 +15,7 @@ type HandlerV1 struct {
 
 func NewHandlerV1(sysConfig *models.SystemConfig) *HandlerV1 {
 	return &HandlerV1{
-		log: sysConfig.Logger,
+		log:         sysConfig.Logger,
 		userService: connections.NewUserService(sysConfig),
 	}
 }

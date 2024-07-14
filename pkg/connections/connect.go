@@ -6,12 +6,13 @@ import (
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func NewUserService(sysConfig *models.SystemConfig) pbu.UserServiceClient {
-	conn, err := grpc.NewClient(sysConfig.Config.AUTH_SERVICE_PORT)
+	conn, err := grpc.NewClient(sysConfig.Config.AUTH_SERVICE_PORT, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		sysConfig.Logger.Fatal("Failed to connect auth servoce", zap.Error(err))
+		sysConfig.Logger.Fatal("Failed to connect auth service", zap.Error(err))
 		return nil
 	}
 

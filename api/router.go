@@ -3,6 +3,7 @@ package api
 import (
 	_ "api_gateway/api/docs"
 	v1 "api_gateway/api/handlers/v1"
+	"api_gateway/api/middleware"
 	"api_gateway/models"
 
 	"github.com/gin-gonic/gin"
@@ -17,7 +18,7 @@ import (
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host localhost:9999
+// @host localhost:8888
 // @BasePath /localeats.uz
 
 // @securityDefinitions.apikey BearerAuth
@@ -34,9 +35,11 @@ func NewRouter(sysConfig *models.SystemConfig) *gin.Engine {
 
 	main := router.Group("/localeats.uz")
 
-	auth := main.Group("/users")
+	main.Use(middleware.JWTMiddleware())
 
-	auth.POST("/:id/profile", handlerV1.GetProfile)
+	users := main.Group("/users")
+
+	users.GET("/:id/profile", handlerV1.GetProfile)
 
 
 	return router
