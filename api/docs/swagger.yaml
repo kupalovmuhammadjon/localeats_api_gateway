@@ -1,0 +1,256 @@
+basePath: /localeats.uz
+definitions:
+  auth.ReqCreateUser:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+      user_type:
+        type: string
+      username:
+        type: string
+    type: object
+  auth.ReqLogin:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  auth.ReqResetPassword:
+    properties:
+      email:
+        type: string
+    type: object
+  auth.ReqUpdatePassword:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  auth.Tokens:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      refresh_token:
+        type: string
+    type: object
+  models.Error:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+host: localhost:9999
+info:
+  contact: {}
+  description: LocalEats is a program to order local and homemade food with quality
+    and precise delivery.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: LocalEats API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: checks the user and returns tokens
+      operationId: login
+      parameters:
+      - description: User Information to log in
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth.ReqLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns access and refresh tokens
+          schema:
+            $ref: '#/definitions/auth.Tokens'
+        "400":
+          description: You did something wrong
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: if Access token fails it will returns this
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Login user
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: removes refresh token gets token from header
+      operationId: logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: some thing wrong with what you sent
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: Invalid token in header
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: log outs user
+      tags:
+      - Auth
+  /auth/refreshtoken:
+    post:
+      consumes:
+      - application/json
+      description: gives new access token through refresh token
+      operationId: refresh
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: some thing wrong with what you sent
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: Invalid token in header
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: refresh token
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Registers user
+      operationId: register
+      parameters:
+      - description: User information to create it
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth.ReqCreateUser'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Register User
+      tags:
+      - Auth
+  /auth/resetpassword:
+    post:
+      consumes:
+      - application/json
+      description: send info about reserttting poassword to email
+      operationId: reset
+      parameters:
+      - description: email of the user
+        in: body
+        name: email
+        required: true
+        schema:
+          $ref: '#/definitions/auth.ReqResetPassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: some thing wrong with what you sent
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: Invalid token in header
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: resets password
+      tags:
+      - Auth
+  /auth/updatepassword/{email}:
+    post:
+      consumes:
+      - application/json
+      description: updates password
+      operationId: updatepassword
+      parameters:
+      - description: email of the user
+        in: path
+        name: email
+        required: true
+        type: string
+      - description: email of the user
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/auth.ReqUpdatePassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: some thing wrong with what you sent
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: Invalid token in header
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: update password
+      tags:
+      - Auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
