@@ -21,7 +21,7 @@ import (
 // @host localhost:8888
 // @BasePath /localeats.uz
 
-// @securityDefinitions.apikey BearerAuth
+// @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
 
@@ -40,6 +40,8 @@ func NewRouter(sysConfig *models.SystemConfig) *gin.Engine {
 	users := main.Group("/users")
 
 	users.GET("/:id/profile", handlerV1.GetProfile)
+	users.PUT("/:id/update", handlerV1.UpdateProfile)
+	users.DELETE("/:id/delete", handlerV1.DeleteUser)
 
 
 	return router

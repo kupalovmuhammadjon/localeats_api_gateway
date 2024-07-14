@@ -7,6 +7,36 @@ definitions:
       message:
         type: string
     type: object
+  user.ReqUpdateUser:
+    properties:
+      address:
+        type: string
+      bio:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+      is_verified:
+        type: boolean
+      phone_number:
+        type: string
+      specialties:
+        items:
+          type: string
+        type: array
+      username:
+        type: string
+      years_of_experience:
+        type: integer
+    type: object
+  user.Status:
+    properties:
+      message:
+        type: string
+    type: object
   user.User:
     properties:
       address:
@@ -49,6 +79,45 @@ info:
   title: LocalEats API Gateway
   version: "1.0"
 paths:
+  /users/{id}/delete:
+    delete:
+      consumes:
+      - application/json
+      description: get full profile information
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: About deletion
+          schema:
+            $ref: '#/definitions/user.Status'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Invalid url
+          schema:
+            type: string
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Gets User Profile by id
+      tags:
+      - Users
   /users/{id}/profile:
     get:
       consumes:
@@ -72,15 +141,62 @@ paths:
           description: 'Invalid inputs can result to '
           schema:
             $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
         "500":
           description: Something went wrong in server
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Gets User Profile by id
+      tags:
+      - Users
+  /users/{id}/update:
+    put:
+      consumes:
+      - application/json
+      description: get full profile information
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User id
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.ReqUpdateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Profile informations
+          schema:
+            $ref: '#/definitions/user.User'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
       summary: Gets User Profile by id
       tags:
       - Users
 securityDefinitions:
-  BearerAuth:
+  ApiKeyAuth:
     in: header
     name: Authorization
     type: apiKey
