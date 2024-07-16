@@ -142,7 +142,6 @@ func (h *HandlerV1) UpdateProfile(ctx *gin.Context) {
 // @Success 200 {object} user.Status "About deletion"
 // @Failure 401 {object} models.Error "No Auth thats the problem "
 // @Failure 400 {object} models.Error "Invalid inputs can result to "
-// @Failure 404 {string} "Invalid url"
 // @Failure 500 {object} models.Error "Something went wrong in server"
 // @Router /users/{id}/delete [delete]
 func (h *HandlerV1) DeleteUser(ctx *gin.Context) {

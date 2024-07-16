@@ -1,5 +1,73 @@
 basePath: /localeats.uz
 definitions:
+  kitchen.KitchenInfo:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      cuisine_type:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      owner_id:
+        type: string
+      phone_number:
+        type: string
+      rating:
+        type: number
+      total_orders:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  kitchen.KitchenShortInfo:
+    properties:
+      address:
+        type: string
+      cuisine_type:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      rating:
+        type: number
+      total_orders:
+        type: string
+    type: object
+  kitchen.Kitchens:
+    properties:
+      Kitchens:
+        items:
+          $ref: '#/definitions/kitchen.KitchenShortInfo'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  kitchen.ReqCreateKitchen:
+    properties:
+      address:
+        type: string
+      cuisine_type:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      owner_id:
+        type: string
+      phone_number:
+        type: string
+    type: object
   models.Error:
     properties:
       error:
@@ -79,6 +147,250 @@ info:
   title: LocalEats API Gateway
   version: "1.0"
 paths:
+  /kitchens:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a paginated list of kitchens
+      parameters:
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: page
+        in: query
+        name: page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of kitchens
+          schema:
+            $ref: '#/definitions/kitchen.Kitchens'
+        "400":
+          description: Invalid inputs
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: No Auth
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get list of kitchens
+      tags:
+      - Kitchens
+  /kitchens/{id}:
+    get:
+      consumes:
+      - application/json
+      description: creates kitchen
+      parameters:
+      - description: Kitchen id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Profile informations
+          schema:
+            $ref: '#/definitions/kitchen.KitchenInfo'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Creates kitchen of user
+      tags:
+      - Kitchens
+  /kitchens/{id}/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Retrieves a paginated list of kitchens
+      parameters:
+      - description: Id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of kitchens
+          schema:
+            $ref: '#/definitions/kitchen.Kitchens'
+        "400":
+          description: Invalid inputs
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: No Auth
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get list of kitchens
+      tags:
+      - Kitchens
+  /kitchens/{id}/update:
+    put:
+      consumes:
+      - application/json
+      description: creates kitchen
+      parameters:
+      - description: Kitchen id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Kitchen information
+        in: body
+        name: kitchen
+        required: true
+        schema:
+          $ref: '#/definitions/kitchen.ReqCreateKitchen'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Profile informations
+          schema:
+            $ref: '#/definitions/user.User'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Creates kitchen of user
+      tags:
+      - Kitchens
+  /kitchens/create:
+    post:
+      consumes:
+      - application/json
+      description: creates kitchen
+      parameters:
+      - description: Kitchen information
+        in: body
+        name: kitchen
+        required: true
+        schema:
+          $ref: '#/definitions/kitchen.ReqCreateKitchen'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Profile informations
+          schema:
+            $ref: '#/definitions/user.User'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Creates kitchen of user
+      tags:
+      - Kitchens
+  /kitchens/search:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a paginated list of kitchens
+      parameters:
+      - description: Name
+        in: query
+        name: name
+        type: string
+      - description: Cuisine Type
+        in: query
+        name: cuisine_type
+        type: string
+      - description: Rating
+        in: query
+        name: rating
+        required: true
+        type: number
+      - description: Address
+        in: query
+        name: address
+        type: string
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: page
+        in: query
+        name: page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of kitchens
+          schema:
+            $ref: '#/definitions/kitchen.Kitchens'
+        "400":
+          description: Invalid inputs
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: No Auth
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get list of kitchens
+      tags:
+      - Kitchens
   /users/{id}/delete:
     delete:
       consumes:
@@ -105,10 +417,6 @@ paths:
           description: 'No Auth thats the problem '
           schema:
             $ref: '#/definitions/models.Error'
-        "404":
-          description: Invalid url
-          schema:
-            type: string
         "500":
           description: Something went wrong in server
           schema:

@@ -43,6 +43,15 @@ func NewRouter(sysConfig *models.SystemConfig) *gin.Engine {
 	users.PUT("/:id/update", handlerV1.UpdateProfile)
 	users.DELETE("/:id/delete", handlerV1.DeleteUser)
 
+	kitchens := main.Group("/kitchens")
+
+	kitchens.POST("/create", handlerV1.CreateKitchen)
+	kitchens.PUT("/:id/update", handlerV1.UpdateKitchen)
+	kitchens.GET("/:id", handlerV1.GetKitchenById)
+	kitchens.GET("/", handlerV1.GetKitchens)
+	kitchens.GET("/search", handlerV1.SearchKitchens)
+	kitchens.DELETE("/:id/delete", handlerV1.DeleteKitchen)
+
 
 	return router
 }
