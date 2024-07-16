@@ -6,7 +6,6 @@ import (
 	"api_gateway/models"
 	logger "api_gateway/pkg/logger"
 
-
 	"go.uber.org/zap"
 )
 
@@ -17,10 +16,9 @@ func main() {
 		panic(err)
 	}
 
-
 	systemConfig := &models.SystemConfig{
-		Config:     cfg,
-		Logger:     log,
+		Config: cfg,
+		Logger: log,
 	}
 
 	router := api.NewRouter(systemConfig)

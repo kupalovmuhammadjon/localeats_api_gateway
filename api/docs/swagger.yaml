@@ -1,5 +1,108 @@
 basePath: /localeats.uz
 definitions:
+  dish.DishInfo:
+    properties:
+      allergens:
+        items:
+          type: string
+        type: array
+      available:
+        type: boolean
+      category:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      dietary_info:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      ingredients:
+        items:
+          type: string
+        type: array
+      kitchen_id:
+        type: string
+      kitchen_name:
+        type: string
+      name:
+        type: string
+      nutrition_info:
+        type: string
+      price:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  dish.DishShortInfo:
+    properties:
+      available:
+        type: boolean
+      category:
+        type: string
+      id:
+        type: string
+      kitchen_id:
+        type: string
+      kitchen_name:
+        type: string
+      price:
+        type: number
+    type: object
+  dish.Dishes:
+    properties:
+      dishes:
+        items:
+          $ref: '#/definitions/dish.DishShortInfo'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  dish.ReqCreateDish:
+    properties:
+      available:
+        type: boolean
+      category:
+        type: string
+      description:
+        type: string
+      ingredients:
+        items:
+          type: string
+        type: array
+      kitchen_id:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+  dish.ReqUpdateDish:
+    properties:
+      available:
+        type: boolean
+      category:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      ingredients:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      price:
+        type: number
+    type: object
   kitchen.KitchenInfo:
     properties:
       address:
@@ -147,6 +250,198 @@ info:
   title: LocalEats API Gateway
   version: "1.0"
 paths:
+  /dishes/{id}:
+    get:
+      consumes:
+      - application/json
+      description: gets dish by id
+      parameters:
+      - description: dish id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dish informations
+          schema:
+            $ref: '#/definitions/dish.DishInfo'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: gets dish by id
+      tags:
+      - Dishes
+  /dishes/{id}/update:
+    put:
+      consumes:
+      - application/json
+      description: Update dish of kitchen
+      parameters:
+      - description: dish id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Kitchen information
+        in: body
+        name: kitchen
+        required: true
+        schema:
+          $ref: '#/definitions/dish.ReqUpdateDish'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dish informations
+          schema:
+            $ref: '#/definitions/dish.DishInfo'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Update dish
+      tags:
+      - Dishes
+  /dishes/{kitchen_id}:
+    delete:
+      consumes:
+      - application/json
+      description: deletes dish
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dish informations
+          schema:
+            $ref: '#/definitions/dish.Dishes'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: deletes dish
+      tags:
+      - Dishes
+  /dishes/all/{kitchen_id}:
+    get:
+      consumes:
+      - application/json
+      description: gets dishes of the kitchen
+      parameters:
+      - description: kitchen id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: page
+        in: query
+        name: page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dish informations
+          schema:
+            $ref: '#/definitions/dish.Dishes'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: gets dishes
+      tags:
+      - Dishes
+  /dishes/create:
+    post:
+      consumes:
+      - application/json
+      description: creates dish
+      parameters:
+      - description: Kitchen information
+        in: body
+        name: kitchen
+        required: true
+        schema:
+          $ref: '#/definitions/dish.ReqCreateDish'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Dish informations
+          schema:
+            $ref: '#/definitions/dish.DishInfo'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Creates dish of kitchen
+      tags:
+      - Dishes
   /kitchens:
     get:
       consumes:
@@ -191,7 +486,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: creates kitchen
+      description: GetKitchenById
       parameters:
       - description: Kitchen id
         in: path
@@ -219,7 +514,7 @@ paths:
             $ref: '#/definitions/models.Error'
       security:
       - ApiKeyAuth: []
-      summary: Creates kitchen of user
+      summary: Gets kichen by id
       tags:
       - Kitchens
   /kitchens/{id}/delete:
@@ -261,7 +556,7 @@ paths:
     put:
       consumes:
       - application/json
-      description: creates kitchen
+      description: Updates kitchen
       parameters:
       - description: Kitchen id
         in: path
@@ -280,7 +575,7 @@ paths:
         "200":
           description: Profile informations
           schema:
-            $ref: '#/definitions/user.User'
+            $ref: '#/definitions/kitchen.KitchenInfo'
         "400":
           description: 'Invalid inputs can result to '
           schema:
@@ -295,7 +590,7 @@ paths:
             $ref: '#/definitions/models.Error'
       security:
       - ApiKeyAuth: []
-      summary: Creates kitchen of user
+      summary: Updates kitchen
       tags:
       - Kitchens
   /kitchens/create:
@@ -313,10 +608,10 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
+        "201":
           description: Profile informations
           schema:
-            $ref: '#/definitions/user.User'
+            $ref: '#/definitions/kitchen.KitchenInfo'
         "400":
           description: 'Invalid inputs can result to '
           schema:

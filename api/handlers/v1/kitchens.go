@@ -20,7 +20,7 @@ import (
 // @Produce json
 // @Security ApiKeyAuth
 // @Param kitchen body kitchen.ReqCreateKitchen true "Kitchen information"
-// @Success 200 {object} user.User "Profile informations"
+// @Success 201 {object} kitchen.KitchenInfo "Profile informations"
 // @Failure 401 {object} models.Error "No Auth thats the problem "
 // @Failure 400 {object} models.Error "Invalid inputs can result to "
 // @Failure 500 {object} models.Error "Something went wrong in server"
@@ -72,15 +72,15 @@ func (h *HandlerV1) CreateKitchen(ctx *gin.Context) {
 }
 
 
-// @Summary Creates kitchen of user
-// @Description creates kitchen 
+// @Summary Updates kitchen
+// @Description Updates kitchen 
 // @Tags Kitchens
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
 // @Param id path string true "Kitchen id"
 // @Param kitchen body kitchen.ReqCreateKitchen true "Kitchen information"
-// @Success 200 {object} user.User "Profile informations"
+// @Success 200 {object} kitchen.KitchenInfo "Profile informations"
 // @Failure 401 {object} models.Error "No Auth thats the problem "
 // @Failure 400 {object} models.Error "Invalid inputs can result to "
 // @Failure 500 {object} models.Error "Something went wrong in server"
@@ -126,8 +126,8 @@ func (h *HandlerV1) UpdateKitchen(ctx *gin.Context) {
 	ctx.JSON(200, kitchen)
 }
 
-// @Summary Creates kitchen of user
-// @Description creates kitchen 
+// @Summary Gets kichen by id
+// @Description  GetKitchenById
 // @Tags Kitchens
 // @Accept json
 // @Produce json
