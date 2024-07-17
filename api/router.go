@@ -40,6 +40,8 @@ func NewRouter(sysConfig *models.SystemConfig) *gin.Engine {
 	users := main.Group("/users")
 
 	users.GET("/:id/profile", handlerV1.GetProfile)
+	users.GET("/:id/preferences", handlerV1.GetUserPreference)
+	users.PUT("/:id/updatepreferences", handlerV1.UpdateUserPreferences)
 	users.PUT("/:id/update", handlerV1.UpdateProfile)
 	users.DELETE("/:id/delete", handlerV1.DeleteUser)
 
@@ -59,6 +61,7 @@ func NewRouter(sysConfig *models.SystemConfig) *gin.Engine {
 	dishes.PUT("/:id/updatenutritions", handlerV1.UpdateDishNutritionInfo)
 	dishes.GET("/:id", handlerV1.GetDishById)
 	dishes.GET("/all/:id", handlerV1.GetDishesByKitchenId)
+	dishes.GET("/recommendations/:user_id", handlerV1.RecommendDishes)
 	dishes.DELETE("/:id/delete", handlerV1.DeleteDish)
 
 	orders := main.Group("/orders")
@@ -68,6 +71,8 @@ func NewRouter(sysConfig *models.SystemConfig) *gin.Engine {
 	orders.GET("/:id", handlerV1.GetOrderById)
 	orders.GET("/user/:id", handlerV1.GetOrdersForUser)
 	orders.GET("/chef/:id", handlerV1.GetOrdersForChef)
+	orders.GET("/statistics/:kitchen_id", handlerV1.GetKitchenStatistics)
+	orders.GET("/favourites/:user_id", handlerV1.GetUserStatistics)
 	orders.DELETE("/:id/delete", handlerV1.DeleteOrder)
 
 	payments := main.Group("/payments")

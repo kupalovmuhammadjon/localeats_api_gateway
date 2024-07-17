@@ -94,7 +94,7 @@ func (h *HandlerV1) UpdateProfile(ctx *gin.Context) {
 	if err != nil {
 		h.log.Info("Error while decoding ", zap.Error(err))
 		ctx.JSON(http.StatusBadRequest, models.Error{
-			Message: "Invalid User Id",
+			Message: "Error while decoding ",
 			Error:   err.Error(),
 		})
 		return
@@ -132,8 +132,8 @@ func (h *HandlerV1) UpdateProfile(ctx *gin.Context) {
 	ctx.JSON(200, user)
 }
 
-// @Summary Gets User Profile by id
-// @Description get full profile information
+// @Summary deletes
+// @Description deletes
 // @Tags Users
 // @Accept json
 // @Produce json
@@ -168,4 +168,94 @@ func (h *HandlerV1) DeleteUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(200, user)
+}
+
+// @Summary Gets User Preferences by id
+// @Description get Preferences information
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "User id"
+// @Param user body user.Preferences true "User id"
+// @Success 200 {object} user.PreferencesRes "Profile informations"
+// @Failure 401 {object} models.Error "No Auth thats the problem "
+// @Failure 400 {object} models.Error "Invalid inputs can result to "
+// @Failure 500 {object} models.Error "Something went wrong in server"
+// @Router /users/{id}/updatepreferences [put]
+func (h *HandlerV1) UpdateUserPreferences(ctx *gin.Context){
+
+	id := ctx.Param("id")
+	_, err := uuid.Parse(id)
+	if err != nil {
+		h.log.Info("Invalid id type uuid", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, models.Error{
+			Message: "Invalid id type uuid",
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	req := &pb.Preferences{}
+
+	err = json.NewDecoder(ctx.Request.Body).Decode(&req)
+	if err != nil {
+		h.log.Info("Error while decoding ", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, models.Error{
+			Message: "Error while decoding",
+			Error:   err.Error(),
+		})
+		return
+	}
+	req.UserId = id
+
+	res, err := h.userService.UpdateUserPreferences(ctx, req)
+	if err != nil {
+		h.log.Info("Error while decoding ", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, models.Error{
+			Message: "Error while decoding",
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(200, res)
+}
+
+// @Summary Gets User Preferences by id
+// @Description get Preferences information
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "User id"
+// @Success 200 {object} user.PreferencesRes "Profile informations"
+// @Failure 401 {object} models.Error "No Auth thats the problem "
+// @Failure 400 {object} models.Error "Invalid inputs can result to "
+// @Failure 500 {object} models.Error "Something went wrong in server"
+// @Router /users/{id}/preferences [get]
+func (h *HandlerV1) GetUserPreference(ctx *gin.Context){
+
+	id := ctx.Param("id")
+	_, err := uuid.Parse(id)
+	if err != nil {
+		h.log.Info("Invalid id type uuid", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, models.Error{
+			Message: "Invalid id type uuid",
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	res, err := h.userService.GetUserPreference(ctx, &pb.Id{Id: id})
+	if err != nil {
+		h.log.Info("Error while decoding ", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, models.Error{
+			Message: "Error while decoding",
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(200, res)
 }

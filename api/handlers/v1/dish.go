@@ -313,3 +313,69 @@ func (h *HandlerV1) DeleteDish(ctx *gin.Context) {
 
 	ctx.JSON(200, dish)
 }
+
+// @Summary gets dishes
+// @Description gets dishes of the kitchen
+// @Tags Dishes
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param user_id path string true "user id"
+// @Param limit query int true "limit"
+// @Param page query int true "page"
+// @Success 200 {object} dish.Recommendations "Dish informations"
+// @Failure 401 {object} models.Error "No Auth thats the problem "
+// @Failure 400 {object} models.Error "Invalid inputs can result to "
+// @Failure 500 {object} models.Error "Something went wrong in server"
+// @Router /dishes/recommendations/{user_id} [get]
+func (h *HandlerV1) RecommendDishes(ctx *gin.Context) {
+
+	req := pb.Filter{}
+
+	id := ctx.Param("user_id")
+	_, err := uuid.Parse(id)
+	if err != nil {
+		h.log.Info("Invalid id type uuid  ", zap.Any("input", id), zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, models.Error{
+			Message: "Invalid id type uuid  ",
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	req.Id = id
+	limit, err := strconv.Atoi(ctx.Query("limit"))
+	if err != nil || limit <= 0 {
+		h.log.Error("Invalid limit", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, models.Error{
+			Message: "Invalid limit parameter",
+			Error:   err.Error(),
+		})
+		return
+	}
+	req.Limit = int32(limit)
+
+	p, err := strconv.Atoi(ctx.Query("page"))
+	if err != nil || p <= 0 {
+		h.log.Error("Invalid offset", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, models.Error{
+			Message: "Invalid offset parameter",
+			Error:   err.Error(),
+		})
+		return
+	}
+	req.Page = int32(p)
+
+	dishes, err := h.dishService.RecommendDishes(ctx, &req)
+
+	if err != nil {
+		h.log.Error("Error while getting recommended dishes by kitchen_id ", zap.Error(err))
+		ctx.JSON(http.StatusInternalServerError, models.Error{
+			Message: "Error while getting recommended dishes by kitchen_id ",
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(200, dishes)
+}

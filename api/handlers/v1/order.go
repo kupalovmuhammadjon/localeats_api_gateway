@@ -293,7 +293,6 @@ func (h *HandlerV1) GetOrdersForChef(ctx *gin.Context) {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param id path string true "id"
-// @Success 200 {object} dish.Dishes "Dish informations"
 // @Failure 401 {object} models.Error "No Auth thats the problem "
 // @Failure 400 {object} models.Error "Invalid inputs can result to "
 // @Failure 500 {object} models.Error "Something went wrong in server"
@@ -323,4 +322,93 @@ func (h *HandlerV1) DeleteOrder(ctx *gin.Context) {
 	}
 
 	ctx.JSON(200, dish)
+}
+
+// @Summary gets statistics
+// @Description Get statistics of all available kitchens within a specified date range
+// @Tags Orders
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param kitchen_id path string true "kitchen id"
+// @Param start_date query string true "Start date in YYYY-MM-DD format"
+// @Param end_date query string true "End date in YYYY-MM-DD format"
+// @Success 200 {object} order.KitchenStatistics "List of kitchens"
+// @Failure 401 {object} models.Error "No Auth"
+// @Failure 400 {object} models.Error "Invalid inputs"
+// @Failure 500 {object} models.Error "Something went wrong in server"
+// @Router /orders/statistics/{kitchen_id} [get]
+func (h *HandlerV1) GetKitchenStatistics(ctx *gin.Context) {
+	req := pb.DateFilter{}
+	id := ctx.Param("kitchen_id")
+	_, err := uuid.Parse(id)
+	if err != nil {
+		h.log.Info("Invalid id type uuid  ", zap.Any("input", id), zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, models.Error{
+			Message: "Invalid id type uuid  ",
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	req.Id = id
+	req.StartDate = ctx.Query("start_date")
+	req.EndDate = ctx.Query("end_date")
+
+	kitchens, err := h.orderService.GetKitchenStatistics(ctx, &req)
+	if err != nil {
+		h.log.Error("Error while getting kitchen statistics", zap.Error(err))
+		ctx.JSON(http.StatusInternalServerError, models.Error{
+			Message: "Error while getting kitchen statistics",
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, kitchens)
+}
+
+
+// @Summary gets statistics
+// @Description Get statistics
+// @Tags Orders
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param user_id path string true "user id"
+// @Param start_date query string true "Start date in YYYY-MM-DD format"
+// @Param end_date query string true "End date in YYYY-MM-DD format"
+// @Success 200 {object} order.KitchenStatistics "List of kitchens"
+// @Failure 401 {object} models.Error "No Auth"
+// @Failure 400 {object} models.Error "Invalid inputs"
+// @Failure 500 {object} models.Error "Something went wrong in server"
+// @Router /orders/favourites/{user_id} [get]
+func (h *HandlerV1) GetUserStatistics(ctx *gin.Context) {
+	req := pb.DateFilter{}
+	id := ctx.Param("user_id")
+	_, err := uuid.Parse(id)
+	if err != nil {
+		h.log.Info("Invalid id type uuid  ", zap.Any("input", id), zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, models.Error{
+			Message: "Invalid id type uuid  ",
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	req.Id = id
+	req.StartDate = ctx.Query("start_date")
+	req.EndDate = ctx.Query("end_date")
+
+	userStats, err := h.orderService.GetUserStatistics(ctx, &req)
+	if err != nil {
+		h.log.Error("Error while getting user statistics", zap.Error(err))
+		ctx.JSON(http.StatusInternalServerError, models.Error{
+			Message: "Error while getting user statistics",
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, userStats)
 }

@@ -139,6 +139,75 @@
                 }
             }
         },
+        "/dishes/recommendations/{user_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "gets dishes of the kitchen",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dishes"
+                ],
+                "summary": "gets dishes",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user id",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dish informations",
+                        "schema": {
+                            "$ref": "#/definitions/dish.Recommendations"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid inputs can result to ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "No Auth thats the problem ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Something went wrong in server",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/dishes/{id}": {
             "get": {
                 "security": [
@@ -841,25 +910,25 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Payments"
+                    "Orders"
                 ],
-                "summary": "Creates payment",
+                "summary": "Creates order",
                 "parameters": [
                     {
-                        "description": "Payment information",
+                        "description": "Order information",
                         "name": "order",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/payment.ReqCreatePayment"
+                            "$ref": "#/definitions/order.ReqCreateOrder"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Payment informations",
+                        "description": "Order informations",
                         "schema": {
-                            "$ref": "#/definitions/payment.PaymentInfo"
+                            "$ref": "#/definitions/order.OrderInfo"
                         }
                     },
                     "400": {
@@ -870,6 +939,144 @@
                     },
                     "401": {
                         "description": "No Auth thats the problem ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Something went wrong in server",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/favourites/{user_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get statistics",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "gets statistics",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user id",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start date in YYYY-MM-DD format",
+                        "name": "start_date",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date in YYYY-MM-DD format",
+                        "name": "end_date",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of kitchens",
+                        "schema": {
+                            "$ref": "#/definitions/order.KitchenStatistics"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid inputs",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "No Auth",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Something went wrong in server",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/statistics/{kitchen_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get statistics of all available kitchens within a specified date range",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "gets statistics",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "kitchen id",
+                        "name": "kitchen_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start date in YYYY-MM-DD format",
+                        "name": "start_date",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date in YYYY-MM-DD format",
+                        "name": "end_date",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of kitchens",
+                        "schema": {
+                            "$ref": "#/definitions/order.KitchenStatistics"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid inputs",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "No Auth",
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }
@@ -1092,10 +1299,61 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Dish informations",
+                    "400": {
+                        "description": "Invalid inputs can result to ",
                         "schema": {
-                            "$ref": "#/definitions/dish.Dishes"
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "No Auth thats the problem ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Something went wrong in server",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/create": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "creates",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Creates payment",
+                "parameters": [
+                    {
+                        "description": "Payment information",
+                        "name": "order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/payment.ReqCreatePayment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Payment informations",
+                        "schema": {
+                            "$ref": "#/definitions/payment.PaymentInfo"
                         }
                     },
                     "400": {
@@ -1323,7 +1581,7 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "get full profile information",
+                "description": "deletes",
                 "consumes": [
                     "application/json"
                 ],
@@ -1333,7 +1591,7 @@
                 "tags": [
                     "Users"
                 ],
-                "summary": "Gets User Profile by id",
+                "summary": "deletes",
                 "parameters": [
                     {
                         "type": "string",
@@ -1348,6 +1606,61 @@
                         "description": "About deletion",
                         "schema": {
                             "$ref": "#/definitions/user.Status"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid inputs can result to ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "No Auth thats the problem ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Something went wrong in server",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}/preferences": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get Preferences information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Gets User Preferences by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Profile informations",
+                        "schema": {
+                            "$ref": "#/definitions/user.PreferencesRes"
                         }
                     },
                     "400": {
@@ -1468,6 +1781,70 @@
                         "description": "Profile informations",
                         "schema": {
                             "$ref": "#/definitions/user.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid inputs can result to ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "No Auth thats the problem ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Something went wrong in server",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}/updatepreferences": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get Preferences information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Gets User Preferences by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "User id",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.Preferences"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Profile informations",
+                        "schema": {
+                            "$ref": "#/definitions/user.PreferencesRes"
                         }
                     },
                     "400": {
@@ -1620,6 +1997,26 @@
                     "type": "string"
                 },
                 "protein": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dish.Recommendations": {
+            "type": "object",
+            "properties": {
+                "dishes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dish.DishShortInfo"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
                     "type": "integer"
                 }
             }
@@ -1797,6 +2194,37 @@
                 }
             }
         },
+        "order.DishStats": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "orders_count": {
+                    "type": "integer"
+                },
+                "revenue": {
+                    "type": "number"
+                }
+            }
+        },
+        "order.HourStats": {
+            "type": "object",
+            "properties": {
+                "hour": {
+                    "type": "string"
+                },
+                "orders_count": {
+                    "type": "integer"
+                },
+                "revenue": {
+                    "type": "number"
+                }
+            }
+        },
         "order.Item": {
             "type": "object",
             "properties": {
@@ -1805,6 +2233,32 @@
                 },
                 "quantity": {
                     "type": "integer"
+                }
+            }
+        },
+        "order.KitchenStatistics": {
+            "type": "object",
+            "properties": {
+                "average_rating": {
+                    "type": "number"
+                },
+                "busiest_hours": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/order.HourStats"
+                    }
+                },
+                "top_dishes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/order.DishStats"
+                    }
+                },
+                "total_orders": {
+                    "type": "integer"
+                },
+                "total_revenue": {
+                    "type": "number"
                 }
             }
         },
@@ -1980,6 +2434,58 @@
                 },
                 "rating": {
                     "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.Preferences": {
+            "type": "object",
+            "properties": {
+                "cuisine_type": {
+                    "type": "string"
+                },
+                "dietary_preferences": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "favorite_kitchen_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.PreferencesRes": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "cuisine_type": {
+                    "type": "string"
+                },
+                "dietary_preferences": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "favorite_kitchen_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "updated_at": {
                     "type": "string"

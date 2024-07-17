@@ -21,7 +21,7 @@ import (
 // @Failure 401 {object} models.Error "No Auth thats the problem "
 // @Failure 400 {object} models.Error "Invalid inputs can result to "
 // @Failure 500 {object} models.Error "Something went wrong in server"
-// @Router /orders/create [post]
+// @Router /payments/create [post]
 func (h *HandlerV1) CreatePayment(ctx *gin.Context) {
 	req := pb.ReqCreatePayment{}
 	err := json.NewDecoder(ctx.Request.Body).Decode(&req)

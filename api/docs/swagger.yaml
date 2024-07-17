@@ -86,6 +86,19 @@ definitions:
       protein:
         type: integer
     type: object
+  dish.Recommendations:
+    properties:
+      dishes:
+        items:
+          $ref: '#/definitions/dish.DishShortInfo'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
   dish.ReqCreateDish:
     properties:
       available:
@@ -199,12 +212,49 @@ definitions:
       message:
         type: string
     type: object
+  order.DishStats:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      orders_count:
+        type: integer
+      revenue:
+        type: number
+    type: object
+  order.HourStats:
+    properties:
+      hour:
+        type: string
+      orders_count:
+        type: integer
+      revenue:
+        type: number
+    type: object
   order.Item:
     properties:
       dish_id:
         type: string
       quantity:
         type: integer
+    type: object
+  order.KitchenStatistics:
+    properties:
+      average_rating:
+        type: number
+      busiest_hours:
+        items:
+          $ref: '#/definitions/order.HourStats'
+        type: array
+      top_dishes:
+        items:
+          $ref: '#/definitions/order.DishStats'
+        type: array
+      total_orders:
+        type: integer
+      total_revenue:
+        type: number
     type: object
   order.OrderInfo:
     properties:
@@ -319,6 +369,40 @@ definitions:
         type: string
       rating:
         type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  user.Preferences:
+    properties:
+      cuisine_type:
+        type: string
+      dietary_preferences:
+        items:
+          type: string
+        type: array
+      favorite_kitchen_ids:
+        items:
+          type: string
+        type: array
+      user_id:
+        type: string
+    type: object
+  user.PreferencesRes:
+    properties:
+      created_at:
+        type: string
+      cuisine_type:
+        type: string
+      dietary_preferences:
+        items:
+          type: string
+        type: array
+      favorite_kitchen_ids:
+        items:
+          type: string
+        type: array
       updated_at:
         type: string
       user_id:
@@ -627,6 +711,51 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Creates dish of kitchen
+      tags:
+      - Dishes
+  /dishes/recommendations/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: gets dishes of the kitchen
+      parameters:
+      - description: user id
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: page
+        in: query
+        name: page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dish informations
+          schema:
+            $ref: '#/definitions/dish.Recommendations'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: gets dishes
       tags:
       - Dishes
   /kitchens:
@@ -958,10 +1087,6 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: Dish informations
-          schema:
-            $ref: '#/definitions/dish.Dishes'
         "400":
           description: 'Invalid inputs can result to '
           schema:
@@ -1030,19 +1155,19 @@ paths:
       - application/json
       description: creates
       parameters:
-      - description: Payment information
+      - description: Order information
         in: body
         name: order
         required: true
         schema:
-          $ref: '#/definitions/payment.ReqCreatePayment'
+          $ref: '#/definitions/order.ReqCreateOrder'
       produces:
       - application/json
       responses:
         "201":
-          description: Payment informations
+          description: Order informations
           schema:
-            $ref: '#/definitions/payment.PaymentInfo'
+            $ref: '#/definitions/order.OrderInfo'
         "400":
           description: 'Invalid inputs can result to '
           schema:
@@ -1057,9 +1182,100 @@ paths:
             $ref: '#/definitions/models.Error'
       security:
       - ApiKeyAuth: []
-      summary: Creates payment
+      summary: Creates order
       tags:
-      - Payments
+      - Orders
+  /orders/favourites/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics
+      parameters:
+      - description: user id
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Start date in YYYY-MM-DD format
+        in: query
+        name: start_date
+        required: true
+        type: string
+      - description: End date in YYYY-MM-DD format
+        in: query
+        name: end_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of kitchens
+          schema:
+            $ref: '#/definitions/order.KitchenStatistics'
+        "400":
+          description: Invalid inputs
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: No Auth
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: gets statistics
+      tags:
+      - Orders
+  /orders/statistics/{kitchen_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics of all available kitchens within a specified date
+        range
+      parameters:
+      - description: kitchen id
+        in: path
+        name: kitchen_id
+        required: true
+        type: string
+      - description: Start date in YYYY-MM-DD format
+        in: query
+        name: start_date
+        required: true
+        type: string
+      - description: End date in YYYY-MM-DD format
+        in: query
+        name: end_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of kitchens
+          schema:
+            $ref: '#/definitions/order.KitchenStatistics'
+        "400":
+          description: Invalid inputs
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: No Auth
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: gets statistics
+      tags:
+      - Orders
   /orders/user/{id}:
     get:
       consumes:
@@ -1105,6 +1321,42 @@ paths:
       summary: gets order
       tags:
       - Orders
+  /payments/create:
+    post:
+      consumes:
+      - application/json
+      description: creates
+      parameters:
+      - description: Payment information
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/payment.ReqCreatePayment'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Payment informations
+          schema:
+            $ref: '#/definitions/payment.PaymentInfo'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Creates payment
+      tags:
+      - Payments
   /reviews/{id}:
     delete:
       consumes:
@@ -1236,7 +1488,7 @@ paths:
     delete:
       consumes:
       - application/json
-      description: get full profile information
+      description: deletes
       parameters:
       - description: User id
         in: path
@@ -1264,7 +1516,42 @@ paths:
             $ref: '#/definitions/models.Error'
       security:
       - ApiKeyAuth: []
-      summary: Gets User Profile by id
+      summary: deletes
+      tags:
+      - Users
+  /users/{id}/preferences:
+    get:
+      consumes:
+      - application/json
+      description: get Preferences information
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Profile informations
+          schema:
+            $ref: '#/definitions/user.PreferencesRes'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Gets User Preferences by id
       tags:
       - Users
   /users/{id}/profile:
@@ -1342,6 +1629,47 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Gets User Profile by id
+      tags:
+      - Users
+  /users/{id}/updatepreferences:
+    put:
+      consumes:
+      - application/json
+      description: get Preferences information
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User id
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.Preferences'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Profile informations
+          schema:
+            $ref: '#/definitions/user.PreferencesRes'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Gets User Preferences by id
       tags:
       - Users
 securityDefinitions:
