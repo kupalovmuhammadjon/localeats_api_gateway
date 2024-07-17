@@ -56,10 +56,29 @@ func NewRouter(sysConfig *models.SystemConfig) *gin.Engine {
 
 	dishes.POST("/create", handlerV1.CreateDish)
 	dishes.PUT("/:id/update", handlerV1.UpdateDish)
+	dishes.PUT("/:id/updatenutritions", handlerV1.UpdateDishNutritionInfo)
 	dishes.GET("/:id", handlerV1.GetDishById)
-	dishes.GET("/all/:kitchen_id", handlerV1.GetDishesByKitchenId)
+	dishes.GET("/all/:id", handlerV1.GetDishesByKitchenId)
 	dishes.DELETE("/:id/delete", handlerV1.DeleteDish)
 
+	orders := main.Group("/orders")
+
+	orders.POST("/create", handlerV1.CreateOrder)
+	orders.PUT("/:id/update", handlerV1.UpdateOrderStatus)
+	orders.GET("/:id", handlerV1.GetOrderById)
+	orders.GET("/user/:id", handlerV1.GetOrdersForUser)
+	orders.GET("/chef/:id", handlerV1.GetOrdersForChef)
+	orders.DELETE("/:id/delete", handlerV1.DeleteOrder)
+
+	payments := main.Group("/payments")
+
+	payments.POST("/create", handlerV1.CreatePayment)
+
+	reviews := main.Group("/reviews")
+
+	reviews.POST("/create", handlerV1.CreateReview)
+	reviews.GET("/:id", handlerV1.GetReviewsByKitchenId)
+	reviews.DELETE("/:id", handlerV1.DeleteReview)
 
 	return router
 }

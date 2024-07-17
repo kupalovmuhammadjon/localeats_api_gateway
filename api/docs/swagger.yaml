@@ -65,6 +65,27 @@ definitions:
       total:
         type: integer
     type: object
+  dish.NutritionInfo:
+    properties:
+      allergens:
+        items:
+          type: string
+        type: array
+      calories:
+        type: integer
+      carbohydrates:
+        type: integer
+      dietary_info:
+        items:
+          type: string
+        type: array
+      fat:
+        type: integer
+      id:
+        type: string
+      protein:
+        type: integer
+    type: object
   dish.ReqCreateDish:
     properties:
       available:
@@ -176,6 +197,131 @@ definitions:
       error:
         type: string
       message:
+        type: string
+    type: object
+  order.Item:
+    properties:
+      dish_id:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  order.OrderInfo:
+    properties:
+      created_at:
+        type: string
+      delivery_address:
+        type: string
+      delivery_time:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/order.Item'
+        type: array
+      kitchen_id:
+        type: string
+      status:
+        type: string
+      total_amount:
+        type: number
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  order.ReqCreateOrder:
+    properties:
+      delivery_address:
+        type: string
+      delivery_time:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/order.Item'
+        type: array
+      kitchen_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  order.Status:
+    properties:
+      id:
+        type: string
+      status:
+        type: string
+    type: object
+  order.StatusRes:
+    properties:
+      id:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  payment.PaymentInfo:
+    properties:
+      amount:
+        type: number
+      created_at:
+        type: string
+      id:
+        type: string
+      order_id:
+        type: string
+      status:
+        type: string
+      transaction_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  payment.ReqCreatePayment:
+    properties:
+      card_number:
+        type: string
+      cvv:
+        type: string
+      expiry_date:
+        type: string
+      order_id:
+        type: string
+      payment_method:
+        type: string
+    type: object
+  review.ReqCreateReview:
+    properties:
+      comment:
+        type: string
+      kitchen_id:
+        type: string
+      order_id:
+        type: string
+      rating:
+        type: integer
+      user_id:
+        type: string
+    type: object
+  review.ReviewInfo:
+    properties:
+      comment:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      kitchen_id:
+        type: string
+      order_id:
+        type: string
+      rating:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
         type: string
     type: object
   user.ReqUpdateUser:
@@ -296,7 +442,7 @@ paths:
         name: id
         required: true
         type: string
-      - description: Kitchen information
+      - description: Dish information
         in: body
         name: kitchen
         required: true
@@ -324,6 +470,47 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update dish
+      tags:
+      - Dishes
+  /dishes/{id}/updatenutritions:
+    put:
+      consumes:
+      - application/json
+      description: UpdateDishNutritionInfo
+      parameters:
+      - description: dish id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dish information
+        in: body
+        name: kitchen
+        required: true
+        schema:
+          $ref: '#/definitions/dish.NutritionInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dish informations
+          schema:
+            $ref: '#/definitions/dish.DishInfo'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: UpdateDishNutritionInfo
       tags:
       - Dishes
   /dishes/{kitchen_id}:
@@ -361,7 +548,7 @@ paths:
       summary: deletes dish
       tags:
       - Dishes
-  /dishes/all/{kitchen_id}:
+  /dishes/all/{id}:
     get:
       consumes:
       - application/json
@@ -414,7 +601,7 @@ paths:
       parameters:
       - description: Kitchen information
         in: body
-        name: kitchen
+        name: dish
         required: true
         schema:
           $ref: '#/definitions/dish.ReqCreateDish'
@@ -686,6 +873,365 @@ paths:
       summary: Get list of kitchens
       tags:
       - Kitchens
+  /orders/{id}:
+    get:
+      consumes:
+      - application/json
+      description: gets
+      parameters:
+      - description: order id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order informations
+          schema:
+            $ref: '#/definitions/order.OrderInfo'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: gets order
+      tags:
+      - Orders
+  /orders/{id}/update:
+    put:
+      consumes:
+      - application/json
+      description: updates
+      parameters:
+      - description: Status information
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/order.Status'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order informations
+          schema:
+            $ref: '#/definitions/order.StatusRes'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: updates order
+      tags:
+      - Orders
+  /orders/{kitchen_id}:
+    delete:
+      consumes:
+      - application/json
+      description: deletes order
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dish informations
+          schema:
+            $ref: '#/definitions/dish.Dishes'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: deletes order
+      tags:
+      - Orders
+  /orders/chef/{id}:
+    get:
+      consumes:
+      - application/json
+      description: gets
+      parameters:
+      - description: order id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: page
+        in: query
+        name: page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order informations
+          schema:
+            $ref: '#/definitions/order.OrderInfo'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: gets order
+      tags:
+      - Orders
+  /orders/create:
+    post:
+      consumes:
+      - application/json
+      description: creates
+      parameters:
+      - description: Payment information
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/payment.ReqCreatePayment'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Payment informations
+          schema:
+            $ref: '#/definitions/payment.PaymentInfo'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Creates payment
+      tags:
+      - Payments
+  /orders/user/{id}:
+    get:
+      consumes:
+      - application/json
+      description: gets
+      parameters:
+      - description: order id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: page
+        in: query
+        name: page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order informations
+          schema:
+            $ref: '#/definitions/order.OrderInfo'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: gets order
+      tags:
+      - Orders
+  /reviews/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: deletes
+      parameters:
+      - description: review id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Review information
+        in: body
+        name: review
+        required: true
+        schema:
+          $ref: '#/definitions/review.ReqCreateReview'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Review informations
+          schema:
+            $ref: '#/definitions/review.ReviewInfo'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: deletes review
+      tags:
+      - Reviews
+    get:
+      consumes:
+      - application/json
+      description: gets
+      parameters:
+      - description: review id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: page
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Review information
+        in: body
+        name: review
+        required: true
+        schema:
+          $ref: '#/definitions/review.ReqCreateReview'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Review informations
+          schema:
+            $ref: '#/definitions/review.ReviewInfo'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get reviews
+      tags:
+      - Reviews
+  /reviews/create:
+    post:
+      consumes:
+      - application/json
+      description: creates
+      parameters:
+      - description: Review information
+        in: body
+        name: review
+        required: true
+        schema:
+          $ref: '#/definitions/review.ReqCreateReview'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Review informations
+          schema:
+            $ref: '#/definitions/review.ReviewInfo'
+        "400":
+          description: 'Invalid inputs can result to '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: 'No Auth thats the problem '
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Something went wrong in server
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Creates review
+      tags:
+      - Reviews
   /users/{id}/delete:
     delete:
       consumes:

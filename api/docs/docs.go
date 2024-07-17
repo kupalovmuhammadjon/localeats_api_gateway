@@ -19,7 +19,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/dishes/all/{kitchen_id}": {
+        "/dishes/all/{id}": {
             "get": {
                 "security": [
                     {
@@ -109,7 +109,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "Kitchen information",
-                        "name": "kitchen",
+                        "name": "dish",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -227,12 +227,76 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Kitchen information",
+                        "description": "Dish information",
                         "name": "kitchen",
                         "in": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/dish.ReqUpdateDish"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dish informations",
+                        "schema": {
+                            "$ref": "#/definitions/dish.DishInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid inputs can result to ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "No Auth thats the problem ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Something went wrong in server",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/dishes/{id}/updatenutritions": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "UpdateDishNutritionInfo",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dishes"
+                ],
+                "summary": "UpdateDishNutritionInfo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "dish id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dish information",
+                        "name": "kitchen",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dish.NutritionInfo"
                         }
                     }
                 ],
@@ -699,6 +763,565 @@ const docTemplate = `{
                 }
             }
         },
+        "/orders/chef/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "gets",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "gets order",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "order id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order informations",
+                        "schema": {
+                            "$ref": "#/definitions/order.OrderInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid inputs can result to ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "No Auth thats the problem ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Something went wrong in server",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/create": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "creates",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Creates payment",
+                "parameters": [
+                    {
+                        "description": "Payment information",
+                        "name": "order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/payment.ReqCreatePayment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Payment informations",
+                        "schema": {
+                            "$ref": "#/definitions/payment.PaymentInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid inputs can result to ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "No Auth thats the problem ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Something went wrong in server",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/user/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "gets",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "gets order",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "order id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order informations",
+                        "schema": {
+                            "$ref": "#/definitions/order.OrderInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid inputs can result to ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "No Auth thats the problem ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Something went wrong in server",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "gets",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "gets order",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "order id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order informations",
+                        "schema": {
+                            "$ref": "#/definitions/order.OrderInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid inputs can result to ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "No Auth thats the problem ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Something went wrong in server",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/{id}/update": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "updates",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "updates order",
+                "parameters": [
+                    {
+                        "description": "Status information",
+                        "name": "order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/order.Status"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order informations",
+                        "schema": {
+                            "$ref": "#/definitions/order.StatusRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid inputs can result to ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "No Auth thats the problem ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Something went wrong in server",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/{kitchen_id}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "deletes order",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "deletes order",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dish informations",
+                        "schema": {
+                            "$ref": "#/definitions/dish.Dishes"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid inputs can result to ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "No Auth thats the problem ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Something went wrong in server",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/reviews/create": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "creates",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "Creates review",
+                "parameters": [
+                    {
+                        "description": "Review information",
+                        "name": "review",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/review.ReqCreateReview"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Review informations",
+                        "schema": {
+                            "$ref": "#/definitions/review.ReviewInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid inputs can result to ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "No Auth thats the problem ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Something went wrong in server",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/reviews/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "gets",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "Get reviews",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "review id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Review information",
+                        "name": "review",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/review.ReqCreateReview"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Review informations",
+                        "schema": {
+                            "$ref": "#/definitions/review.ReviewInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid inputs can result to ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "No Auth thats the problem ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Something went wrong in server",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "deletes",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "deletes review",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "review id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Review information",
+                        "name": "review",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/review.ReqCreateReview"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Review informations",
+                        "schema": {
+                            "$ref": "#/definitions/review.ReviewInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid inputs can result to ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "No Auth thats the problem ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Something went wrong in server",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/users/{id}/delete": {
             "delete": {
                 "security": [
@@ -975,6 +1598,38 @@ const docTemplate = `{
                 }
             }
         },
+        "dish.NutritionInfo": {
+            "type": "object",
+            "properties": {
+                "allergens": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "calories": {
+                    "type": "integer"
+                },
+                "carbohydrates": {
+                    "type": "integer"
+                },
+                "dietary_info": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "fat": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "protein": {
+                    "type": "integer"
+                }
+            }
+        },
         "dish.ReqCreateDish": {
             "type": "object",
             "properties": {
@@ -1144,6 +1799,198 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "order.Item": {
+            "type": "object",
+            "properties": {
+                "dish_id": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "order.OrderInfo": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "delivery_address": {
+                    "type": "string"
+                },
+                "delivery_time": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/order.Item"
+                    }
+                },
+                "kitchen_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "total_amount": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "order.ReqCreateOrder": {
+            "type": "object",
+            "properties": {
+                "delivery_address": {
+                    "type": "string"
+                },
+                "delivery_time": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/order.Item"
+                    }
+                },
+                "kitchen_id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "order.Status": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "order.StatusRes": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "payment.PaymentInfo": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "transaction_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "payment.ReqCreatePayment": {
+            "type": "object",
+            "properties": {
+                "card_number": {
+                    "type": "string"
+                },
+                "cvv": {
+                    "type": "string"
+                },
+                "expiry_date": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "payment_method": {
+                    "type": "string"
+                }
+            }
+        },
+        "review.ReqCreateReview": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "kitchen_id": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "rating": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "review.ReviewInfo": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "kitchen_id": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "rating": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "string"
                 }
             }

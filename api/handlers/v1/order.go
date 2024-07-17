@@ -1,7 +1,7 @@
 package v1
 
 import (
-	pb "api_gateway/genproto/dish"
+	pb "api_gateway/genproto/order"
 	"api_gateway/models"
 	"encoding/json"
 	"net/http"
@@ -12,20 +12,20 @@ import (
 	"go.uber.org/zap"
 )
 
-// @Summary Creates dish of kitchen
-// @Description creates dish
-// @Tags Dishes
+// @Summary Creates order
+// @Description creates
+// @Tags Orders
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param dish body dish.ReqCreateDish true "Kitchen information"
-// @Success 201 {object} dish.DishInfo "Dish informations"
+// @Param order body order.ReqCreateOrder true "Order information"
+// @Success 201 {object} order.OrderInfo "Order informations"
 // @Failure 401 {object} models.Error "No Auth thats the problem "
 // @Failure 400 {object} models.Error "Invalid inputs can result to "
 // @Failure 500 {object} models.Error "Something went wrong in server"
-// @Router /dishes/create [post]
-func (h *HandlerV1) CreateDish(ctx *gin.Context) {
-	req := pb.ReqCreateDish{}
+// @Router /orders/create [post]
+func (h *HandlerV1) CreateOrder(ctx *gin.Context) {
+	req := pb.ReqCreateOrder{}
 
 	err := json.NewDecoder(ctx.Request.Body).Decode(&req)
 	if err != nil {
@@ -39,19 +39,29 @@ func (h *HandlerV1) CreateDish(ctx *gin.Context) {
 
 	_, err = uuid.Parse(req.KitchenId)
 	if err != nil {
-		h.log.Info("Invalid id type uuid  ", zap.Any("input", req.KitchenId), zap.Error(err))
+		h.log.Info("Invalid kitchen id type uuid  ", zap.Any("input", req.KitchenId), zap.Error(err))
 		ctx.JSON(http.StatusBadRequest, models.Error{
-			Message: "Invalid id type uuid  ",
+			Message: "Invalid kitchen id type uuid  ",
 			Error:   err.Error(),
 		})
 		return
 	}
 
-	dish, err := h.dishService.CreateDish(ctx, &req)
+	_, err = uuid.Parse(req.UserId)
 	if err != nil {
-		h.log.Error("Error while creating dish ", zap.Error(err))
+		h.log.Info("Invalid user id type uuid  ", zap.Any("input", req.KitchenId), zap.Error(err))
 		ctx.JSON(http.StatusBadRequest, models.Error{
-			Message: "Error while creating dish ",
+			Message: "Invalid user id type uuid  ",
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	dish, err := h.orderService.CreateOrder(ctx, &req)
+	if err != nil {
+		h.log.Error("Error while creating order ", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, models.Error{
+			Message: "Error while creating order ",
 			Error:   err.Error(),
 		})
 		return
@@ -60,21 +70,20 @@ func (h *HandlerV1) CreateDish(ctx *gin.Context) {
 	ctx.JSON(201, dish)
 }
 
-// @Summary Update dish
-// @Description Update dish of kitchen
-// @Tags Dishes
+// @Summary updates order
+// @Description updates
+// @Tags Orders
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param id path string true "dish id"
-// @Param kitchen body dish.ReqUpdateDish true "Dish information"
-// @Success 200 {object} dish.DishInfo "Dish informations"
+// @Param order body order.Status true "Status information"
+// @Success 200 {object} order.StatusRes "Order informations"
 // @Failure 401 {object} models.Error "No Auth thats the problem "
 // @Failure 400 {object} models.Error "Invalid inputs can result to "
 // @Failure 500 {object} models.Error "Something went wrong in server"
-// @Router /dishes/{id}/update [put]
-func (h *HandlerV1) UpdateDish(ctx *gin.Context) {
-	req := pb.ReqUpdateDish{}
+// @Router /orders/{id}/update [put]
+func (h *HandlerV1) UpdateOrderStatus(ctx *gin.Context) {
+	req := pb.Status{}
 
 	id := ctx.Param("id")
 
@@ -97,39 +106,34 @@ func (h *HandlerV1) UpdateDish(ctx *gin.Context) {
 		})
 		return
 	}
-
 	req.Id = id
 
-	dish, err := h.dishService.UpdateDish(ctx, &req)
-
+	dish, err := h.orderService.UpdateOrderStatus(ctx, &req)
 	if err != nil {
-		h.log.Error("Error while updating dish ", zap.Error(err))
-		ctx.JSON(http.StatusInternalServerError, models.Error{
-			Message: "Error while updating dish ",
+		h.log.Error("Error while UpdateOrderStatus ", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, models.Error{
+			Message: "Error while UpdateOrderStatus ",
 			Error:   err.Error(),
 		})
 		return
 	}
 
-	ctx.JSON(200, dish)
+	ctx.JSON(201, dish)
 }
 
-
-// @Summary UpdateDishNutritionInfo
-// @Description  UpdateDishNutritionInfo 
-// @Tags Dishes
+// @Summary gets order
+// @Description gets
+// @Tags Orders
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param id path string true "dish id"
-// @Param kitchen body dish.NutritionInfo true "Dish information"
-// @Success 200 {object} dish.DishInfo "Dish informations"
+// @Param id path string true "order id"
+// @Success 200 {object} order.OrderInfo "Order informations"
 // @Failure 401 {object} models.Error "No Auth thats the problem "
 // @Failure 400 {object} models.Error "Invalid inputs can result to "
 // @Failure 500 {object} models.Error "Something went wrong in server"
-// @Router /dishes/{id}/updatenutritions [put]
-func (h *HandlerV1) UpdateDishNutritionInfo(ctx *gin.Context) {
-	req := pb.NutritionInfo{}
+// @Router /orders/{id} [get]
+func (h *HandlerV1) GetOrderById(ctx *gin.Context) {
 
 	id := ctx.Param("id")
 
@@ -143,91 +147,38 @@ func (h *HandlerV1) UpdateDishNutritionInfo(ctx *gin.Context) {
 		return
 	}
 
-	err = json.NewDecoder(ctx.Request.Body).Decode(&req)
+	dish, err := h.orderService.GetOrderById(ctx, &pb.Id{Id: id})
 	if err != nil {
-		h.log.Info("Error while decoding ", zap.Error(err))
+		h.log.Error("Error while GetOrderById ", zap.Error(err))
 		ctx.JSON(http.StatusBadRequest, models.Error{
-			Message: "Error while decoding ",
+			Message: "Error while GetOrderById ",
 			Error:   err.Error(),
 		})
 		return
 	}
 
-	req.Id = id
-
-	dish, err := h.dishService.UpdateNutritionInfo(ctx, &req)
-
-	if err != nil {
-		h.log.Error("Error while updating dish NutritionInfo", zap.Error(err))
-		ctx.JSON(http.StatusInternalServerError, models.Error{
-			Message: "Error while updating dish NutritionInfo",
-			Error:   err.Error(),
-		})
-		return
-	}
-
-	ctx.JSON(200, dish)
+	ctx.JSON(201, dish)
 }
 
-// @Summary gets dish by id
-// @Description gets dish by id
-// @Tags Dishes
+// @Summary gets order
+// @Description gets
+// @Tags Orders
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param id path string true "dish id"
-// @Success 200 {object} dish.DishInfo "Dish informations"
-// @Failure 401 {object} models.Error "No Auth thats the problem "
-// @Failure 400 {object} models.Error "Invalid inputs can result to "
-// @Failure 500 {object} models.Error "Something went wrong in server"
-// @Router /dishes/{id} [get]
-func (h *HandlerV1) GetDishById(ctx *gin.Context) {
-
-	id := ctx.Param("id")
-
-	_, err := uuid.Parse(id)
-	if err != nil {
-		h.log.Info("Invalid id type uuid  ", zap.Any("input", id), zap.Error(err))
-		ctx.JSON(http.StatusBadRequest, models.Error{
-			Message: "Invalid id type uuid  ",
-			Error:   err.Error(),
-		})
-		return
-	}
-
-	dish, err := h.dishService.GetDishById(ctx, &pb.Id{Id: id})
-
-	if err != nil {
-		h.log.Error("Error while getting dish by id ", zap.Error(err))
-		ctx.JSON(http.StatusInternalServerError, models.Error{
-			Message: "Error while getting dish by id ",
-			Error:   err.Error(),
-		})
-		return
-	}
-
-	ctx.JSON(200, dish)
-}
-
-// @Summary gets dishes
-// @Description gets dishes of the kitchen
-// @Tags Dishes
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Param id path string true "kitchen id"
+// @Param id path string true "order id"
 // @Param limit query int true "limit"
 // @Param page query int true "page"
-// @Success 200 {object} dish.Dishes "Dish informations"
+// @Success 200 {object} order.OrderInfo "Order informations"
 // @Failure 401 {object} models.Error "No Auth thats the problem "
 // @Failure 400 {object} models.Error "Invalid inputs can result to "
 // @Failure 500 {object} models.Error "Something went wrong in server"
-// @Router /dishes/all/{id} [get]
-func (h *HandlerV1) GetDishesByKitchenId(ctx *gin.Context) {
+// @Router /orders/user/{id} [get]
+func (h *HandlerV1) GetOrdersForUser(ctx *gin.Context) {
 
-	req := pb.Pagination{}
-
+	req := pb.Filter{}
 	id := ctx.Param("id")
+
 	_, err := uuid.Parse(id)
 	if err != nil {
 		h.log.Info("Invalid id type uuid  ", zap.Any("input", id), zap.Error(err))
@@ -237,8 +188,6 @@ func (h *HandlerV1) GetDishesByKitchenId(ctx *gin.Context) {
 		})
 		return
 	}
-
-	req.Id = id
 	limit, err := strconv.Atoi(ctx.Query("limit"))
 	if err != nil || limit <= 0 {
 		h.log.Error("Invalid limit", zap.Error(err))
@@ -261,23 +210,85 @@ func (h *HandlerV1) GetDishesByKitchenId(ctx *gin.Context) {
 	}
 	req.Page = int32(p)
 
-	dish, err := h.dishService.GetDishes(ctx, &req)
-
+	dish, err := h.orderService.GetOrdersForUser(ctx, &req)
 	if err != nil {
-		h.log.Error("Error while getting dishes by kitchen_id ", zap.Error(err))
-		ctx.JSON(http.StatusInternalServerError, models.Error{
-			Message: "Error while getting dishes by kitchen_id ",
+		h.log.Error("Error while GetOrdersForUser ", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, models.Error{
+			Message: "Error while GetOrdersForUser ",
 			Error:   err.Error(),
 		})
 		return
 	}
 
-	ctx.JSON(200, dish)
+	ctx.JSON(201, dish)
 }
 
-// @Summary deletes dish
-// @Description deletes dish
-// @Tags Dishes
+// @Summary gets order
+// @Description gets
+// @Tags Orders
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "order id"
+// @Param limit query int true "limit"
+// @Param page query int true "page"
+// @Success 200 {object} order.OrderInfo "Order informations"
+// @Failure 401 {object} models.Error "No Auth thats the problem "
+// @Failure 400 {object} models.Error "Invalid inputs can result to "
+// @Failure 500 {object} models.Error "Something went wrong in server"
+// @Router /orders/chef/{id} [get]
+func (h *HandlerV1) GetOrdersForChef(ctx *gin.Context) {
+
+	req := pb.Filter{}
+	id := ctx.Param("id")
+
+	_, err := uuid.Parse(id)
+	if err != nil {
+		h.log.Info("Invalid id type uuid  ", zap.Any("input", id), zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, models.Error{
+			Message: "Invalid id type uuid  ",
+			Error:   err.Error(),
+		})
+		return
+	}
+	limit, err := strconv.Atoi(ctx.Query("limit"))
+	if err != nil || limit <= 0 {
+		h.log.Error("Invalid limit", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, models.Error{
+			Message: "Invalid limit parameter",
+			Error:   err.Error(),
+		})
+		return
+	}
+	req.Limit = int32(limit)
+
+	p, err := strconv.Atoi(ctx.Query("page"))
+	if err != nil || p <= 0 {
+		h.log.Error("Invalid offset", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, models.Error{
+			Message: "Invalid offset parameter",
+			Error:   err.Error(),
+		})
+		return
+	}
+	req.Page = int32(p)
+
+	dish, err := h.orderService.GetOrdersForChef(ctx, &req)
+	if err != nil {
+		h.log.Error("Error while GetOrdersForChef ", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, models.Error{
+			Message: "Error while GetOrdersForChef ",
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(201, dish)
+}
+
+// @Summary deletes order
+// @Description deletes order
+// @Tags Orders
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
@@ -286,8 +297,8 @@ func (h *HandlerV1) GetDishesByKitchenId(ctx *gin.Context) {
 // @Failure 401 {object} models.Error "No Auth thats the problem "
 // @Failure 400 {object} models.Error "Invalid inputs can result to "
 // @Failure 500 {object} models.Error "Something went wrong in server"
-// @Router /dishes/{kitchen_id} [delete]
-func (h *HandlerV1) DeleteDish(ctx *gin.Context) {
+// @Router /orders/{kitchen_id} [delete]
+func (h *HandlerV1) DeleteOrder(ctx *gin.Context) {
 
 	id := ctx.Param("id")
 	_, err := uuid.Parse(id)
@@ -300,12 +311,12 @@ func (h *HandlerV1) DeleteDish(ctx *gin.Context) {
 		return
 	}
 
-	dish, err := h.dishService.DeleteDish(ctx, &pb.Id{Id: id})
+	dish, err := h.orderService.DeleteOrder(ctx, &pb.Id{Id: id})
 
 	if err != nil {
-		h.log.Error("Error while deleting dish ", zap.Error(err))
+		h.log.Error("Error while deleting order ", zap.Error(err))
 		ctx.JSON(http.StatusInternalServerError, models.Error{
-			Message: "Error while deleting dish ",
+			Message: "Error while deleting order ",
 			Error:   err.Error(),
 		})
 		return
